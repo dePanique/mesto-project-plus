@@ -3,17 +3,25 @@ import { IRequest } from '../types/express';
 import { handleError } from '../utils/utils';
 import User from '../models/user';
 
+const bcrypt = require('bcrypt');
+
 export const getUsers = (req: Request, res: Response) => (User.find({})
   .then((users) => res.send(users))
   .catch(() => handleError(res))
 );
 
-export const createUser = (req: Request, res: Response) => {
-  const { name, about, avatar } = req.body;
+export const createUser = async (req: Request, res: Response) => {
+  const {
+    name, about, avatar, email,
+  } = req.body;
 
-  return User.create({ name, about, avatar })
-    .then((user) => { res.send(user); })
-    .catch(() => handleError(res));
+  await bcrypt.hash(req.body.password, 10)
+    .then((hash: string) => (User.create({
+      name, about, avatar, email, password: hash,
+    })
+      .then((user) => { res.send(user); })
+      .catch(() => handleError(res))
+    ));
 };
 
 export const getUserById = async (req: IRequest, res: Response) => {
