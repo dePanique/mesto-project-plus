@@ -23,7 +23,6 @@ const card = new Schema<ICard>({
   },
   owner: {
     type: Schema.Types.ObjectId,
-    required: true,
   },
   likes: {
     type: [Schema.Types.ObjectId],
