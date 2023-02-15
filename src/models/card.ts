@@ -1,6 +1,8 @@
 import {
   Schema, model, Types,
 } from 'mongoose';
+import validator from 'validator';
+import { errorMessages } from '../utils/constants';
 
 interface ICard {
   name: string
@@ -20,6 +22,10 @@ const card = new Schema<ICard>({
   link: {
     type: String,
     required: true,
+    validate: {
+      validator: (v: string) => validator.isURL(v),
+      message: `my_error_message: ${errorMessages.invalidURL}`,
+    },
   },
   owner: {
     type: Schema.Types.ObjectId,

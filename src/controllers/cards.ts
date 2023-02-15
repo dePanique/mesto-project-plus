@@ -27,7 +27,7 @@ export const postCard = async (req: IRequest, res: Response) => {
 
 export const deleteCard = async (_: IRequest, res: Response) => {
   try {
-    await Card.deleteOne({ _id: '63dfb0c14fe95fa24fe6f25f' });
+    await Card.deleteOne({ _id: '63ed2308eff69aa95cdfe99f' });
   } catch (err: any) {
     handleError(err, res);
   }
@@ -37,7 +37,7 @@ export const putLikeOnCard = async (req: IRequest, res: Response) => {
   const _id = req.user?._id;
 
   await Card.findByIdAndUpdate(
-    '63dfb0c14fe95fa24fe6f25f',
+    '63ed2308eff69aa95cdfe99f',
     { $addToSet: { likes: _id } },
     { new: true },
   )
@@ -49,7 +49,7 @@ export const deleteLikeOnCard = async (req: IRequest, res: Response) => {
   const _id = req.user?._id;
 
   await Card.findByIdAndUpdate(
-    '63dfb0c14fe95fa24fe6f25f',
+    '63ed2308eff69aa95cdfe99f',
     { $pull: { likes: _id } },
     { new: true },
   )

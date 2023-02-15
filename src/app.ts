@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use((req: IRequest, _: Response, next: NextFunction) => {
   req.user = {
-    _id: '63e154506ef766d9d5451fb0',
+    _id: '63ed2308eff69aa95cdfe99f',
   };
 
   next();

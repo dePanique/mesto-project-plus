@@ -1,6 +1,8 @@
 import {
   Schema, model,
 } from 'mongoose';
+import validator from 'validator';
+import { errorMessages } from '../utils/constants';
 
 interface ICard {
   name: string
@@ -8,7 +10,6 @@ interface ICard {
   avatar: string
 }
 
-// Валидация это тема второй части задания
 const user = new Schema<ICard>({
   name: {
     type: String,
@@ -25,6 +26,10 @@ const user = new Schema<ICard>({
   avatar: {
     type: String,
     required: true,
+    validate: {
+      validator: (v: string) => validator.isURL(v),
+      message: errorMessages.invalidURL,
+    },
   },
 });
 
