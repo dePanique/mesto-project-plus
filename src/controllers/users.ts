@@ -10,10 +10,10 @@ export const getUsers = (_: Request, res: Response) => (
     .catch((err) => handleError(err, res))
 );
 
-export const createUser = (req: Request, res: Response) => {
+export const createUser = async (req: Request, res: Response) => {
   const { name, about, avatar } = req.body;
 
-  return User.create({ name, about, avatar })
+  await User.create({ name, about, avatar })
     .then((user) => { res.send(user); })
     .catch((err) => handleError(err, res));
 };
