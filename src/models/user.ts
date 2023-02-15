@@ -8,7 +8,6 @@ interface ICard {
   avatar: string
 }
 
-// Валидация это тема второй части задания
 const user = new Schema<ICard>({
   name: {
     type: String,

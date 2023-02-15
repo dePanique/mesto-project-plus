@@ -14,7 +14,7 @@ export const createUser = (req: Request, res: Response) => {
   const { name, about, avatar } = req.body;
 
   return User.create({ name, about, avatar })
-    .then((user) => res.send(user))
+    .then((user) => { res.send(user); })
     .catch((err) => handleError(err, res));
 };
 
@@ -26,7 +26,6 @@ export const getUserById = async (req: IRequest, res: Response) => {
     .catch((err) => handleError(err, res));
 };
 
-// Валидация это тема второй части задания
 export const patchUserProfile = async (req: IRequest, res: Response) => {
   const _id = req.user?._id;
   const { name, about, avatar } = req.body;
@@ -40,7 +39,6 @@ export const patchUserProfile = async (req: IRequest, res: Response) => {
     .catch((err) => handleError(err, res));
 };
 
-// Валидация это тема второй части задания
 export const updateUserAvatar = async (req: IRequest, res: Response) => {
   const _id = req.user?._id;
 
