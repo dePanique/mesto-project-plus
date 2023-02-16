@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import { IRequest } from '../types/express';
 import User from '../models/user';
 import { handleError } from '../utils/utils';
+import { PASS_KEY } from '../utils/constants';
 
 const bcrypt = require('bcrypt');
 
@@ -55,4 +57,33 @@ export const updateUserAvatar = async (req: IRequest, res: Response) => {
   )
     .then((user) => res.send(user))
     .catch((err) => handleError(err, res));
+};
+
+export const login = (req: Request, res: Response) => {
+  const { email, password } = req.body;
+
+  User.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        throw new Error('Неправильные почта или пароль');
+      }
+
+      return bcrypt.compare(password, user.password).then((matched:boolean) => {
+        if (!matched) {
+          return Promise.reject(new Error('Неправильные почта или пароль'));
+        }
+
+        return user;
+      });
+    })
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, PASS_KEY, { expiresIn: '7d' });
+
+      res.send({ token });
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
 };

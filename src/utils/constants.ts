@@ -5,4 +5,6 @@ export const errorMessages = {
   invalidURL: 'Некорректный URL картинки',
 };
 
+export const PASS_KEY = 'howdy';
+
 export default errorMessages;

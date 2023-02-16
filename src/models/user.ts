@@ -28,6 +28,10 @@ const user = new Schema<ICard>({
   avatar: {
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    validate: {
+      validator: (v: string) => validator.isURL(v),
+      message: errorMessages.invalidURL,
+    },
   },
   email: {
     type: String,
@@ -37,10 +41,6 @@ const user = new Schema<ICard>({
   password: {
     type: String,
     required: true,
-    validate: {
-      validator: (v: string) => validator.isURL(v),
-      message: errorMessages.invalidURL,
-    },
   },
 });
 
