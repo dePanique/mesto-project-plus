@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { IRequest } from '../types/express';
-import { handleError } from '../utils/utils';
 import User from '../models/user';
+import { handleError } from '../utils/utils';
 
 const bcrypt = require('bcrypt');
 
 export const getUsers = (req: Request, res: Response) => (User.find({})
   .then((users) => res.send(users))
-  .catch(() => handleError(res))
+  .catch((err) => handleError(err, res))
 );
 
 export const createUser = async (req: Request, res: Response) => {
@@ -20,7 +20,7 @@ export const createUser = async (req: Request, res: Response) => {
       name, about, avatar, email, password: hash,
     })
       .then((user) => { res.send(user); })
-      .catch(() => handleError(res))
+      .catch((err) => handleError(err, res))
     ));
 };
 
@@ -28,20 +28,21 @@ export const getUserById = async (req: IRequest, res: Response) => {
   const _id = req.user?._id;
 
   await User.find({ _id })
-    .then(([user]) => {
-      res.send(user);
-    })
-    .catch(() => handleError(res));
+    .then(([user]) => res.send(user))
+    .catch((err) => handleError(err, res));
 };
 
 export const patchUserProfile = async (req: IRequest, res: Response) => {
   const _id = req.user?._id;
+  const { name, about, avatar } = req.body;
 
-  await User.updateOne({ _id })
-    .then((user) => {
-      res.send(user);
-    })
-    .catch(() => handleError(res));
+  await User.findByIdAndUpdate(
+    _id,
+    { name, about, avatar },
+    { new: true, runValidator: true },
+  )
+    .then((user) => res.send(user))
+    .catch((err) => handleError(err, res));
 };
 
 export const updateUserAvatar = async (req: IRequest, res: Response) => {
@@ -50,8 +51,8 @@ export const updateUserAvatar = async (req: IRequest, res: Response) => {
   await User.findByIdAndUpdate(
     _id,
     { avatar: 'Hardcode avatar' },
-    { new: true },
+    { new: true, runValidator: true },
   )
     .then((user) => res.send(user))
-    .catch(() => handleError(res));
+    .catch((err) => handleError(err, res));
 };

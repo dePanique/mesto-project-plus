@@ -1,6 +1,8 @@
 import {
   Schema, model,
 } from 'mongoose';
+import validator from 'validator';
+import { errorMessages } from '../utils/constants';
 
 interface ICard {
   name: string
@@ -35,6 +37,10 @@ const user = new Schema<ICard>({
   password: {
     type: String,
     required: true,
+    validate: {
+      validator: (v: string) => validator.isURL(v),
+      message: errorMessages.invalidURL,
+    },
   },
 });
 
