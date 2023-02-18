@@ -2,12 +2,12 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { IRequest } from '../types/express';
 import User from '../models/user';
-import { handleError } from '../utils/utils';
+import { handleError, pullUserId } from '../utils/utils';
 import { PASS_KEY } from '../utils/constants';
 
 const bcrypt = require('bcrypt');
 
-export const getUsers = (req: Request, res: Response) => (User.find({})
+export const getUsers = (_: Request, res: Response) => (User.find({})
   .then((users) => res.send(users))
   .catch((err) => handleError(err, res))
 );
@@ -27,7 +27,7 @@ export const createUser = async (req: Request, res: Response) => {
 };
 
 export const getUserById = async (req: IRequest, res: Response) => {
-  const _id = req.user?._id;
+  const _id = pullUserId(req, res);
 
   await User.find({ _id })
     .then(([user]) => res.send(user))
@@ -35,7 +35,7 @@ export const getUserById = async (req: IRequest, res: Response) => {
 };
 
 export const patchUserProfile = async (req: IRequest, res: Response) => {
-  const _id = req.user?._id;
+  const _id = pullUserId(req, res);
   const { name, about, avatar } = req.body;
 
   await User.findByIdAndUpdate(
@@ -48,11 +48,12 @@ export const patchUserProfile = async (req: IRequest, res: Response) => {
 };
 
 export const updateUserAvatar = async (req: IRequest, res: Response) => {
-  const _id = req.user?._id;
+  const _id = pullUserId(req, res);
+  const { avatar } = req.body;
 
   await User.findByIdAndUpdate(
     _id,
-    { avatar: 'Hardcode avatar' },
+    { avatar },
     { new: true, runValidator: true },
   )
     .then((user) => res.send(user))
@@ -89,11 +90,9 @@ export const login = (req: Request, res: Response) => {
 };
 
 export const getUserInfo = (req: IRequest, res: Response) => {
-  if (req.user?._id) {
-    const { _id } = req.user;
+  const _id = pullUserId(req, res);
 
-    User.find({ _id })
-      .then((users) => res.send(users))
-      .catch((err) => handleError(err, res));
-  }
+  User.find({ _id })
+    .then((users) => res.send(users))
+    .catch((err) => handleError(err, res));
 };

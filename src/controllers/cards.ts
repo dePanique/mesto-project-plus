@@ -2,10 +2,9 @@ import { Response } from 'express';
 import { IRequest } from '../types/express';
 import Card from '../models/card';
 import User from '../models/user';
-import { handleError } from '../utils/utils';
+import { handleError, pullUserId } from '../utils/utils';
 
 export const getCard = (_: IRequest, res: Response) => (
-
   Card.find({})
     .then((cards) => res.send(cards))
     .catch((err) => handleError(err, res))
@@ -13,7 +12,7 @@ export const getCard = (_: IRequest, res: Response) => (
 
 export const postCard = async (req: IRequest, res: Response) => {
   const { name, link } = req.body;
-  const _id = req.user?._id;
+  const _id = pullUserId(req, res);
 
   await User.find({ _id }).then((user) => {
     const [owner] = user;
@@ -25,19 +24,21 @@ export const postCard = async (req: IRequest, res: Response) => {
     .catch((err) => handleError(err, res));
 };
 
-export const deleteCard = async (_: IRequest, res: Response) => {
+export const deleteCard = async (req: IRequest, res: Response) => {
+  const _id = pullUserId(req, res);
+
   try {
-    await Card.deleteOne({ _id: '63ed2308eff69aa95cdfe99f' });
+    await Card.deleteOne({ _id });
   } catch (err: any) {
     handleError(err, res);
   }
 };
 
 export const putLikeOnCard = async (req: IRequest, res: Response) => {
-  const _id = req.user?._id;
+  const _id = pullUserId(req, res);
 
   await Card.findByIdAndUpdate(
-    '63ed2308eff69aa95cdfe99f',
+    _id,
     { $addToSet: { likes: _id } },
     { new: true },
   )
@@ -46,10 +47,10 @@ export const putLikeOnCard = async (req: IRequest, res: Response) => {
 };
 
 export const deleteLikeOnCard = async (req: IRequest, res: Response) => {
-  const _id = req.user?._id;
+  const _id = pullUserId(req, res);
 
   await Card.findByIdAndUpdate(
-    '63ed2308eff69aa95cdfe99f',
+    _id,
     { $pull: { likes: _id } },
     { new: true },
   )

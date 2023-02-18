@@ -53,3 +53,11 @@ export const pageNotFound = (_: IRequest, res: Response) => {
 export const sayHello = (_: IRequest, res: Response) => {
   res.send('Hello');
 };
+
+export const pullUserId = (req: IRequest, res: Response) => {
+  const _id = req.user?._id || res
+    .status(401)
+    .send({ message: 'Необходима авторизация' });
+
+  return _id;
+};
