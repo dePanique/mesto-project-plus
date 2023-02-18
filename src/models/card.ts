@@ -4,7 +4,7 @@ import {
 import validator from 'validator';
 import { errorMessages } from '../utils/constants';
 
-interface ICard {
+export interface ICard {
   name: string
   link: string
   owner: Types.ObjectId

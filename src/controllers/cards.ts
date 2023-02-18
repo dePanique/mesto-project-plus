@@ -26,12 +26,25 @@ export const postCard = async (req: IRequest, res: Response) => {
 
 export const deleteCard = async (req: IRequest, res: Response) => {
   const _id = pullUserId(req, res);
+  const { cardId } = req.params;
+  console.log(cardId);
 
-  try {
-    await Card.deleteOne({ _id });
-  } catch (err: any) {
-    handleError(err, res);
-  }
+  await Card.find({ _id: cardId })
+    .then(async ([card]) => {
+      if (!card) {
+        console.log('hey');
+        return Promise.reject(new Error('Карточка не найдена'));
+      }
+
+      if (!(card.owner.toString() === _id)) {
+        console.log('hop');
+        return Promise.reject(new Error('В доступе отказано'));
+      }
+      console.log('done');
+      await Card.findByIdAndDelete({ _id: cardId });
+      return res.send({ message: 'success' });
+    })
+    .catch((err) => handleError(err, res));
 };
 
 export const putLikeOnCard = async (req: IRequest, res: Response) => {
