@@ -23,7 +23,7 @@ const card = new Schema<ICard>({
     type: String,
     required: true,
     validate: {
-      validator: (v: string) => validator.isURL(v),
+      validator: (URL: string) => validator.isURL(URL),
       message: `my_error_message: ${errorMessages.invalidURL}`,
     },
   },

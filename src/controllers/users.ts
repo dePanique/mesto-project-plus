@@ -76,14 +76,24 @@ export const login = (req: Request, res: Response) => {
         return user;
       });
     })
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, PASS_KEY, { expiresIn: '7d' });
+    .then(({ _id }) => {
+      const token = jwt.sign({ _id }, PASS_KEY, { expiresIn: '7d' });
 
       res.send({ token });
     })
-    .catch((err) => {
+    .catch(({ message }) => {
       res
         .status(401)
-        .send({ message: err.message });
+        .send({ message });
     });
+};
+
+export const getUserInfo = (req: IRequest, res: Response) => {
+  if (req.user?._id) {
+    const { _id } = req.user;
+
+    User.find({ _id })
+      .then((users) => res.send(users))
+      .catch((err) => handleError(err, res));
+  }
 };
