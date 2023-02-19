@@ -41,6 +41,7 @@ const user = new Schema<ICard>({
       validator: (email: string) => validator.isEmail(email),
       message: errorMessages.invalidURL,
     },
+    select: false,
   },
   password: {
     type: String,

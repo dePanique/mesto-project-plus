@@ -63,7 +63,7 @@ export const updateUserAvatar = async (req: IRequest, res: Response) => {
 export const login = (req: Request, res: Response) => {
   const { email, password } = req.body;
 
-  User.findOne({ email })
+  User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
         throw new Error('Неправильные почта или пароль');
