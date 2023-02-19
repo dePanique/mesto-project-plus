@@ -1,9 +1,10 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { IRequest } from '../types/express';
 import User from '../models/user';
 import { handleError, pullUserId } from '../utils/utils';
 import { PASS_KEY } from '../utils/constants';
+import MestoErrors from '../errors/mesto-errors';
 
 const bcrypt = require('bcrypt');
 
@@ -60,18 +61,18 @@ export const updateUserAvatar = async (req: IRequest, res: Response) => {
     .catch((err) => handleError(err, res));
 };
 
-export const login = (req: Request, res: Response) => {
+export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
 
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new Error('Неправильные почта или пароль');
+        throw new MestoErrors('Неправильные почта или пароль', 404);
       }
 
-      return bcrypt.compare(password, user.password).then((matched:boolean) => {
+      return bcrypt.compare(password, user?.password).then((matched:boolean) => {
         if (!matched) {
-          return Promise.reject(new Error('Неправильные почта или пароль'));
+          throw new MestoErrors('Неправильные почта или пароль', 404);
         }
 
         return user;
@@ -82,17 +83,13 @@ export const login = (req: Request, res: Response) => {
 
       res.send({ token });
     })
-    .catch(({ message }) => {
-      res
-        .status(401)
-        .send({ message });
-    });
+    .catch(next);
 };
 
-export const getUserInfo = (req: IRequest, res: Response) => {
+export const getUserInfo = (req: IRequest, res: Response, next: NextFunction) => {
   const _id = pullUserId(req, res);
 
   User.find({ _id })
     .then((users) => res.send(users))
-    .catch((err) => handleError(err, res));
+    .catch(next);
 };
