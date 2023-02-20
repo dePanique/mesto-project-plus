@@ -1,3 +1,5 @@
+import { errorMessages } from '../utils/constants';
+
 export interface IMestoErros extends Error {
   statusCode: number
 }
@@ -5,7 +7,7 @@ export interface IMestoErros extends Error {
 export default class extends Error implements IMestoErros {
   statusCode;
 
-  constructor(message: string = 'На сервере произошла ошибка', error: number = 500) {
+  constructor(message: string = errorMessages.errorOccured, error: number = 500) {
     super(message);
     this.statusCode = error;
   }

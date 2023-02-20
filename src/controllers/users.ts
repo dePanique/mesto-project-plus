@@ -2,18 +2,18 @@ import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { IRequest } from '../types/express';
 import User from '../models/user';
-import { handleError, pullUserId } from '../utils/utils';
-import { PASS_KEY } from '../utils/constants';
+import { pullUserId } from '../utils/utils';
+import { errorMessages, PASS_KEY } from '../utils/constants';
 import MestoErrors from '../errors/mesto-errors';
 
 const bcrypt = require('bcrypt');
 
-export const getUsers = (_: Request, res: Response) => (User.find({})
+export const getUsers = (_: Request, res: Response, next: NextFunction) => (User.find({})
   .then((users) => res.send(users))
-  .catch((err) => handleError(err, res))
+  .catch(next)
 );
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
   const {
     name, about, avatar, email,
   } = req.body;
@@ -23,20 +23,36 @@ export const createUser = async (req: Request, res: Response) => {
       name, about, avatar, email, password: hash,
     })
       .then((user) => { res.send(user); })
-      .catch((err) => handleError(err, res))
+      .catch(next)
     ));
 };
 
-export const getUserById = async (req: IRequest, res: Response) => {
+export const getUserById = async (req: IRequest, res: Response, next: NextFunction) => {
   const _id = pullUserId(req, res);
+  const { userId } = req.params;
+
+  if (_id !== userId) {
+    next(new MestoErrors(errorMessages.accessDenied, 403));
+  }
 
   await User.find({ _id })
-    .then(([user]) => res.send(user))
-    .catch((err) => handleError(err, res));
+    .then(([user]) => {
+      if (!user) {
+        throw new MestoErrors(errorMessages.dataNotFound, 404);
+      }
+
+      res.send(user);
+    })
+    .catch(next);
 };
 
-export const patchUserProfile = async (req: IRequest, res: Response) => {
+export const patchUserProfile = async (req: IRequest, res: Response, next: NextFunction) => {
   const _id = pullUserId(req, res);
+
+  if (!_id) {
+    next(new MestoErrors(errorMessages.errorOccured, 500));
+  }
+
   const { name, about, avatar } = req.body;
 
   await User.findByIdAndUpdate(
@@ -45,11 +61,15 @@ export const patchUserProfile = async (req: IRequest, res: Response) => {
     { new: true, runValidator: true },
   )
     .then((user) => res.send(user))
-    .catch((err) => handleError(err, res));
+    .catch(next);
 };
 
-export const updateUserAvatar = async (req: IRequest, res: Response) => {
+export const updateUserAvatar = async (req: IRequest, res: Response, next: NextFunction) => {
   const _id = pullUserId(req, res);
+  if (!_id) {
+    next(new MestoErrors(errorMessages.errorOccured, 500));
+  }
+
   const { avatar } = req.body;
 
   await User.findByIdAndUpdate(
@@ -58,7 +78,7 @@ export const updateUserAvatar = async (req: IRequest, res: Response) => {
     { new: true, runValidator: true },
   )
     .then((user) => res.send(user))
-    .catch((err) => handleError(err, res));
+    .catch(next);
 };
 
 export const login = (req: Request, res: Response, next: NextFunction) => {
@@ -67,12 +87,12 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new MestoErrors('Неправильные почта или пароль', 404);
+        next(new MestoErrors('Неправильные почта или пароль', 404));
       }
 
       return bcrypt.compare(password, user?.password).then((matched:boolean) => {
         if (!matched) {
-          throw new MestoErrors('Неправильные почта или пароль', 404);
+          next(new MestoErrors('Неправильные почта или пароль', 404));
         }
 
         return user;
