@@ -1,14 +1,17 @@
 import { Router } from 'express';
 import {
+  deleteCardByIdValidator, deleteLikeOnCardValidator, postCardValidator, putLikeOnCardValidator,
+} from '../middlewares/requestValidator';
+import {
   deleteCard, deleteLikeOnCard, getCard, postCard, putLikeOnCard,
 } from '../controllers/cards';
 
 const router = Router();
 
 router.get('/', getCard);
-router.post('/', postCard);
-router.delete('/:cardId', deleteCard);
-router.put('/:cardId/likes', putLikeOnCard);
-router.delete('/:cardId/likes', deleteLikeOnCard);
+router.post('/', postCardValidator, postCard);
+router.delete('/:cardId', deleteCardByIdValidator, deleteCard);
+router.put('/:cardId/likes', putLikeOnCardValidator, putLikeOnCard);
+router.delete('/:cardId/likes', deleteLikeOnCardValidator, deleteLikeOnCard);
 
 export default router;

@@ -54,10 +54,8 @@ export const sayHello = (_: IRequest, res: Response) => {
   res.send('Hello');
 };
 
-export const pullUserId = (req: IRequest, res: Response) => {
-  const _id = req.user?._id || res
-    .status(401)
-    .send({ message: 'Необходима авторизация' });
+export const pullUserId = (req: IRequest): String => {
+  const _id = req.user?._id || '';
 
   return _id;
 };

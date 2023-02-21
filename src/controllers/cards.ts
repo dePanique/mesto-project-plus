@@ -14,7 +14,7 @@ export const getCard = (_: IRequest, res: Response, next: NextFunction) => (
 
 export const postCard = async (req: IRequest, res: Response, next: NextFunction) => {
   const { name, link } = req.body;
-  const _id = pullUserId(req, res);
+  const _id = pullUserId(req);
 
   if (!_id) {
     next(new MestoErrors(errorMessages.errorOccured, 500));
@@ -31,7 +31,7 @@ export const postCard = async (req: IRequest, res: Response, next: NextFunction)
 };
 
 export const deleteCard = async (req: IRequest, res: Response, next: NextFunction) => {
-  const _id = pullUserId(req, res);
+  const _id = pullUserId(req);
   const { cardId } = req.params;
 
   if (!_id) {
@@ -59,7 +59,7 @@ export const deleteCard = async (req: IRequest, res: Response, next: NextFunctio
 };
 
 export const putLikeOnCard = async (req: IRequest, res: Response, next: NextFunction) => {
-  const _id = pullUserId(req, res);
+  const _id = pullUserId(req);
   const { cardId } = req.params;
 
   await Card.findByIdAndUpdate(
@@ -72,7 +72,7 @@ export const putLikeOnCard = async (req: IRequest, res: Response, next: NextFunc
 };
 
 export const deleteLikeOnCard = async (req: IRequest, res: Response, next: NextFunction) => {
-  const _id = pullUserId(req, res);
+  const _id = pullUserId(req);
   const { cardId } = req.params;
 
   await Card.findByIdAndUpdate(

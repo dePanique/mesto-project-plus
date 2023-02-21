@@ -1,12 +1,15 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import { signupValidator, signinValidator } from './middlewares/requestValidator';
 import { requestLogger, errorLogger } from './middlewares/logger';
 import usersRouter from './routes/users';
 import cardsRouter from './routes/cards';
 import baseRouter from './routes/base';
 import { createUser, login } from './controllers/users';
 import auth from './middlewares/auth';
-import errors from './middlewares/errors';
+import mestoErrors from './middlewares/mestoErrors';
+
+const { errors } = require('celebrate');
 
 const app = express();
 
@@ -20,13 +23,15 @@ app.use(requestLogger);
 
 app.use('/users', auth, usersRouter);
 app.use('/cards', auth, cardsRouter);
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin', signinValidator, login);
+app.post('/signup', signupValidator, createUser);
 
 app.use('/', baseRouter);
 
 app.use(errorLogger);
 
-app.use(errors);
+app.use(errors());
+
+app.use(mestoErrors);
 
 app.listen(3000, () => console.log('online'));
