@@ -4,7 +4,7 @@ import {
 import validator from 'validator';
 import { errorMessages } from '../utils/constants';
 
-interface ICard {
+export interface ICard {
   name: string
   link: string
   owner: Types.ObjectId
@@ -23,7 +23,7 @@ const card = new Schema<ICard>({
     type: String,
     required: true,
     validate: {
-      validator: (v: string) => validator.isURL(v),
+      validator: (URL: string) => validator.isURL(URL),
       message: `my_error_message: ${errorMessages.invalidURL}`,
     },
   },

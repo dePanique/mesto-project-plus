@@ -1,29 +1,37 @@
-import express, { NextFunction, Response } from 'express';
+import express from 'express';
 import mongoose from 'mongoose';
-
-import { IRequest } from './types/express';
+import { signupValidator, signinValidator } from './middlewares/requestValidator';
+import { requestLogger, errorLogger } from './middlewares/logger';
 import usersRouter from './routes/users';
 import cardsRouter from './routes/cards';
 import baseRouter from './routes/base';
+import { createUser, login } from './controllers/users';
+import auth from './middlewares/auth';
+import mestoErrors from './middlewares/mestoErrors';
+
+const { errors } = require('celebrate');
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use((req: IRequest, _: Response, next: NextFunction) => {
-  req.user = {
-    _id: '63ed2308eff69aa95cdfe99f',
-  };
-
-  next();
-});
 
 mongoose.set('strictQuery', false);
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
-app.use('/users', usersRouter);
-app.use('/cards', cardsRouter);
+app.use(requestLogger);
+
+app.use('/users', auth, usersRouter);
+app.use('/cards', auth, cardsRouter);
+app.post('/signin', signinValidator, login);
+app.post('/signup', signupValidator, createUser);
 
 app.use('/', baseRouter);
+
+app.use(errorLogger);
+
+app.use(errors());
+
+app.use(mestoErrors);
 
 app.listen(3000, () => console.log('online'));

@@ -1,58 +1,85 @@
-import { Response } from 'express';
+import { NextFunction, Response } from 'express';
+import MestoErrors from '../errors/mesto-errors';
+import { errorMessages } from '../utils/constants';
 import { IRequest } from '../types/express';
 import Card from '../models/card';
 import User from '../models/user';
-import { handleError } from '../utils/utils';
+import { pullUserId } from '../utils/utils';
 
-export const getCard = (_: IRequest, res: Response) => (
-
+export const getCard = (_: IRequest, res: Response, next: NextFunction) => (
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch((err) => handleError(err, res))
+    .catch(next)
 );
 
-export const postCard = async (req: IRequest, res: Response) => {
+export const postCard = async (req: IRequest, res: Response, next: NextFunction) => {
   const { name, link } = req.body;
-  const _id = req.user?._id;
+  const _id = pullUserId(req);
+
+  if (!_id) {
+    next(new MestoErrors(errorMessages.errorOccured, 500));
+  }
 
   await User.find({ _id }).then((user) => {
     const [owner] = user;
 
     return Card.create({ name, link, owner })
       .then((card) => res.send(card))
-      .catch((err) => handleError(err, res));
+      .catch(next);
   })
-    .catch((err) => handleError(err, res));
+    .catch(next);
 };
 
-export const deleteCard = async (_: IRequest, res: Response) => {
-  try {
-    await Card.deleteOne({ _id: '63ed2308eff69aa95cdfe99f' });
-  } catch (err: any) {
-    handleError(err, res);
+export const deleteCard = async (req: IRequest, res: Response, next: NextFunction) => {
+  const _id = pullUserId(req);
+  const { cardId } = req.params;
+
+  if (!_id) {
+    next(new MestoErrors(errorMessages.errorOccured, 500));
   }
+
+  await Card.find({ _id: cardId })
+    .then(async ([card]) => {
+      if (!card) {
+        next(new MestoErrors(errorMessages.dataNotFound, 404));
+      }
+
+      if (!(card.owner.toString() === _id)) {
+        next(new MestoErrors(errorMessages.accessDenied, 403));
+      }
+
+      await Card
+        .findByIdAndDelete({ _id: cardId })
+        .catch(next);
+
+      return res
+        .send({ message: 'success' });
+    })
+    .catch(next);
 };
 
-export const putLikeOnCard = async (req: IRequest, res: Response) => {
-  const _id = req.user?._id;
+export const putLikeOnCard = async (req: IRequest, res: Response, next: NextFunction) => {
+  const _id = pullUserId(req);
+  const { cardId } = req.params;
 
   await Card.findByIdAndUpdate(
-    '63ed2308eff69aa95cdfe99f',
+    cardId,
     { $addToSet: { likes: _id } },
     { new: true },
   )
-    .then((user) => res.send(user))
-    .catch((err) => handleError(err, res));
+    .then((card) => res.send(card))
+    .catch(next);
 };
 
-export const deleteLikeOnCard = async (req: IRequest, res: Response) => {
-  const _id = req.user?._id;
+export const deleteLikeOnCard = async (req: IRequest, res: Response, next: NextFunction) => {
+  const _id = pullUserId(req);
+  const { cardId } = req.params;
 
   await Card.findByIdAndUpdate(
-    '63ed2308eff69aa95cdfe99f',
+    cardId,
     { $pull: { likes: _id } },
     { new: true },
   )
-    .then((user) => res.send(user))
-    .catch((err) => handleError(err, res));
+    .then((card) => res.send(card))
+    .catch(next);
 };
