@@ -5,9 +5,9 @@ const avatarRegExp = new RegExp(/^http[s]?:\/\/(www\.)?[A-Za-z0-9-._~:\/?#@!$&'(
 export const signupValidator = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(4).max(10),
-    name: Joi.string().min(3).max(14),
-    about: Joi.string().min(3).max(50),
+    password: Joi.string().required(),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
     avatar: Joi.string().regex(avatarRegExp),
   }),
 });
@@ -15,57 +15,55 @@ export const signupValidator = celebrate({
 export const signinValidator = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(4).max(10),
+    password: Joi.string().required(),
   }),
 });
 
 export const getUserByIdValidator = celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().required().min(24).max(24),
+    userId: Joi.string().required().hex().min(24)
+      .max(24),
   }),
 });
 
 export const updateUserInfoValidator = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(3).max(14),
-    about: Joi.string().min(3).max(50),
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
   }),
 });
 
 export const updateUserAvatarValidator = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().regex(avatarRegExp),
+    avatar: Joi.string().required().regex(avatarRegExp),
   }),
 });
 
-// export const getUserInfoValidator = celebrate({
-//   body: Joi.object().keys({
-//     userId: Joi.string().required().min(24).max(24),
-//   }),
-// });
-
 export const postCardValidator = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(3).max(14),
+    name: Joi.string().min(2).max(30),
     link: Joi.string().required(),
   }),
 });
 
 export const deleteCardByIdValidator = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().required().min(24).max(24),
+    cardId: Joi.string().required().hex().min(24)
+      .max(24),
   }),
 });
 
 export const putLikeOnCardValidator = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().required().min(24).max(24),
+    cardId: Joi.string().required().hex().min(24)
+      .max(24),
   }),
 });
 
 export const deleteLikeOnCardValidator = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().required().min(24).max(24),
+    cardId: Joi.string().required().hex().min(24)
+      .max(24),
   }),
 });
 
