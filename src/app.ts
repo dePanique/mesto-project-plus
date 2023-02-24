@@ -1,13 +1,13 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import { signupValidator, signinValidator } from './middlewares/requestValidator';
+import { signupValidator, signinValidator } from './middlewares/request-validator';
 import { requestLogger, errorLogger } from './middlewares/logger';
 import usersRouter from './routes/users';
 import cardsRouter from './routes/cards';
-import baseRouter from './routes/base';
+import pageNotFound from './routes/page-not-found';
 import { createUser, login } from './controllers/users';
 import auth from './middlewares/auth';
-import mestoErrors from './middlewares/mestoErrors';
+import mestoErrors from './middlewares/mesto-errors';
 
 const { errors } = require('celebrate');
 
@@ -26,7 +26,7 @@ app.use('/cards', auth, cardsRouter);
 app.post('/signin', signinValidator, login);
 app.post('/signup', signupValidator, createUser);
 
-app.use('/', baseRouter);
+app.use('*', auth, pageNotFound);
 
 app.use(errorLogger);
 

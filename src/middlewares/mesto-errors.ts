@@ -2,10 +2,13 @@ import {
   NextFunction,
   Request, Response,
 } from 'express';
-import { IMestoErros } from '../errors/mesto-errors';
+
+interface IMestoErros extends Error {
+  statusCode?: number,
+}
 
 export default (err: IMestoErros, req: Request, res: Response, next: NextFunction) => {
-  const { statusCode, message } = err;
+  const { statusCode = 500, message = 'Ошибка сервера' } = err;
 
   res
     .status(statusCode)

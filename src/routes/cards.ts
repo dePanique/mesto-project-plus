@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
   deleteCardByIdValidator, deleteLikeOnCardValidator, postCardValidator, putLikeOnCardValidator,
-} from '../middlewares/requestValidator';
+} from '../middlewares/request-validator';
 import {
   deleteCard, deleteLikeOnCard, getCard, postCard, putLikeOnCard,
 } from '../controllers/cards';

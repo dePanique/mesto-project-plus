@@ -4,7 +4,7 @@ import {
 import validator from 'validator';
 import { errorMessages } from '../utils/constants';
 
-interface ICard {
+export interface IUser {
   name: string
   about: string
   avatar: string
@@ -12,7 +12,7 @@ interface ICard {
   password: string
 }
 
-const user = new Schema<ICard>({
+const user = new Schema<IUser>({
   name: {
     type: String,
     minLength: 2,
@@ -22,7 +22,7 @@ const user = new Schema<ICard>({
   about: {
     type: String,
     minLength: 2,
-    maxLength: 200,
+    maxLength: 30,
     default: 'Исследователь',
   },
   avatar: {
@@ -41,11 +41,19 @@ const user = new Schema<ICard>({
       validator: (email: string) => validator.isEmail(email),
       message: errorMessages.invalidURL,
     },
-    select: false,
   },
   password: {
     type: String,
     required: true,
+    select: false,
+  },
+});
+
+user.set('toJSON', {
+  transform(doc, ret) {
+    // eslint-disable-next-line
+    delete ret.password;
+    return ret;
   },
 });
 

@@ -29,6 +29,7 @@ const card = new Schema<ICard>({
   },
   owner: {
     type: Schema.Types.ObjectId,
+    required: true,
   },
   likes: {
     type: [Schema.Types.ObjectId],
@@ -36,7 +37,7 @@ const card = new Schema<ICard>({
   },
   createdAt: {
     type: Date,
-    default: Date.now(),
+    default: Date.now,
   },
 });
 
