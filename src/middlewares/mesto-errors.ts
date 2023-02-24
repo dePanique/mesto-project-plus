@@ -5,7 +5,7 @@ import {
 import { IMestoErros } from '../errors/mesto-errors';
 
 export default (err: IMestoErros, req: Request, res: Response, next: NextFunction) => {
-  const { statusCode, message } = err;
+  const { statusCode = 500, message } = err;
 
   res
     .status(statusCode)

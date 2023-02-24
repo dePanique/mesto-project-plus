@@ -5,7 +5,7 @@ import { PASS_KEY } from '../utils/constants';
 interface SessionRequest extends Request {
     user?: string | JwtPayload;
 }
-
+// TODO нужен соответствующий объект ошибки
 const handleAuthError = (res: Response) => {
   res
     .status(401)
