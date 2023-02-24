@@ -38,11 +38,11 @@ export const updateUserAvatarValidator = celebrate({
   }),
 });
 
-export const getUserInfoValidator = celebrate({
-  body: Joi.object().keys({
-    userId: Joi.string().required().min(24).max(24),
-  }),
-});
+// export const getUserInfoValidator = celebrate({
+//   body: Joi.object().keys({
+//     userId: Joi.string().required().min(24).max(24),
+//   }),
+// });
 
 export const postCardValidator = celebrate({
   body: Joi.object().keys({
