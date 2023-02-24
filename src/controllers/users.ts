@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import NotFoundError from '../errors/NotFoundError';
 import { IRequest } from '../types/express';
 import User from '../models/user';
 import { pullUserId } from '../utils/utils';
-import { errorMessages, PASS_KEY } from '../utils/constants';
-import MestoErrors from '../errors/mesto-errors';
+import { PASS_KEY } from '../utils/constants';
+import UnauthorizedError from '../errors/BadRequestError';
 
 export const getUsers = (_: Request, res: Response, next: NextFunction) => (User.find({})
   .then((users) => res.send(users))
@@ -32,7 +33,7 @@ export const getUserById = (req: IRequest, res: Response, next: NextFunction) =>
   User.find({ _id: userId })
     .then(([user]) => {
       if (!user) {
-        throw new MestoErrors(errorMessages.dataNotFound, 404);
+        throw new NotFoundError();
       }
 
       res.send(user);
@@ -74,17 +75,12 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        next(new MestoErrors('Неправильные почта или пароль', 401));
-      }
-
-      // TODO удалить
-      if (user?.password === undefined) {
-        throw new MestoErrors(errorMessages.errorOccured, 500);
+        throw new UnauthorizedError();
       }
 
       return bcrypt.compare(password, user.password).then((matched:boolean) => {
         if (!matched) {
-          throw new MestoErrors('Неправильные почта или пароль', 404);
+          throw new UnauthorizedError();
         }
 
         return user;

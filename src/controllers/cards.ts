@@ -1,9 +1,9 @@
 import { NextFunction, Response } from 'express';
-import MestoErrors from '../errors/mesto-errors';
-import { errorMessages } from '../utils/constants';
 import { IRequest } from '../types/express';
 import Card from '../models/card';
 import { pullUserId } from '../utils/utils';
+import NotFoundError from '../errors/NotFoundError';
+import ForbiddenError from '../errors/ForbiddenError';
 
 export const getCard = (_: IRequest, res: Response, next: NextFunction) => (
   Card.find({})
@@ -27,11 +27,11 @@ export const deleteCard = (req: IRequest, res: Response, next: NextFunction) => 
   Card.find({ _id: cardId })
     .then(async ([card]) => {
       if (!card) {
-        throw new MestoErrors(errorMessages.dataNotFound, 404);
+        throw new NotFoundError();
       }
 
       if (!(card.owner.toString() === _id)) {
-        throw new MestoErrors(errorMessages.accessDenied, 403);
+        throw new ForbiddenError();
       }
 
       Card
@@ -54,7 +54,7 @@ export const putLikeOnCard = (req: IRequest, res: Response, next: NextFunction) 
     { new: true },
   )
     .orFail(() => {
-      throw new MestoErrors(errorMessages.dataNotFound, 404);
+      throw new NotFoundError();
     })
     .then((card) => res.send(card))
     .catch(next);
@@ -70,7 +70,7 @@ export const deleteLikeOnCard = (req: IRequest, res: Response, next: NextFunctio
     { new: true },
   )
     .orFail(() => {
-      throw new MestoErrors(errorMessages.dataNotFound, 404);
+      throw new NotFoundError();
     })
     .then((card) => res.send(card))
     .catch(next);

@@ -1,11 +1,8 @@
-import { Response } from 'express';
+import NotFoundError from '../errors/NotFoundError';
 import { IRequest } from '../types/express';
 
-// TODO использовать соответствующий объект ошибки
-export const pageNotFound = (_: IRequest, res: Response) => {
-  res.status(404).send({
-    message: 'Запрашиваемый ресурс не найден',
-  });
+export const pageNotFound = () => {
+  throw new NotFoundError();
 };
 
 export const pullUserId = (req: IRequest): String => {

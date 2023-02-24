@@ -19,7 +19,7 @@
   },
   "include": [
     "src/**/*.ts"
-, "src/errors/mesto-errors.ts"  ],
+, "src/errors/BadRequestError.ts"  ],
   "exclude": [
     "node_modules"
   ],
