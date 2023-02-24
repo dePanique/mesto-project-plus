@@ -4,7 +4,7 @@ import {
 import validator from 'validator';
 import { errorMessages } from '../utils/constants';
 
-interface IUser {
+export interface IUser {
   name: string
   about: string
   avatar: string
@@ -46,6 +46,14 @@ const user = new Schema<IUser>({
     type: String,
     required: true,
     select: false,
+  },
+});
+
+user.set('toJSON', {
+  transform(doc, ret) {
+    // eslint-disable-next-line
+    delete ret.password;
+    return ret;
   },
 });
 
