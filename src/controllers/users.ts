@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import NotFoundError from '../errors/NotFoundError';
 import { IRequest } from '../types/express';
 import User from '../models/user';
 import { pullUserId } from '../utils/utils';
 import { PASS_KEY } from '../utils/constants';
-import UnauthorizedError from '../errors/BadRequestError';
+import UnauthorizedError from '../errors/UnauthorizedError';
+import NotFoundError from '../errors/NotFoundError';
+import ConflictError from '../errors/ConflictError';
 
 export const getUsers = (_: Request, res: Response, next: NextFunction) => (User.find({})
   .then((users) => res.send(users))
@@ -22,6 +23,11 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     .then((hash: string) => (User.create({
       name, about, avatar, email, password: hash,
     })
+      .catch((err) => {
+        if (err.code === 11000) {
+          throw new ConflictError();
+        }
+      })
       .then((user) => { res.send(user); })
       .catch(next)
     ));
