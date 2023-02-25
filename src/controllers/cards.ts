@@ -36,10 +36,11 @@ export const deleteCard = (req: IRequest, res: Response, next: NextFunction) => 
 
       Card
         .findByIdAndDelete({ _id: cardId })
+        .then(() => {
+          res
+            .send({ message: 'success' });
+        })
         .catch(next);
-
-      return res
-        .send({ message: 'success' });
     })
     .catch(next);
 };
